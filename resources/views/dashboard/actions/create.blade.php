@@ -29,7 +29,7 @@
 
         <div class="mb-3">
             <label for="result" class="form-label">Result</label>
-            <textarea id="result" name="result" class="form-control" rows="3" required></textarea>
+            <textarea id="result" name="result" class="form-control" rows="3" ></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary">Add Action</button>

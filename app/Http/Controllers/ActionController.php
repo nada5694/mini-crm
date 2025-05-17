@@ -13,14 +13,7 @@ class ActionController extends Controller
     public function index()
     {
         $user = Auth::user();
-
-        if ($user->role === 'admin') {
-            $actions = Action::with('customer', 'user')->get();
-        } else {
-            $actions = Action::with('customer')
-                ->where('user_id', $user->id)
-                ->get();
-        }
+        $actions = Action::with('customer', 'user')->get();
 
         return view('dashboard.actions.index', compact('actions'));
     }
@@ -43,12 +36,8 @@ class ActionController extends Controller
             'result'      => 'nullable|string',
         ]);
 
-        if ($user->role !== 'admin') {
-            $customer = Customer::findOrFail($validated['customer_id']);
-            if ($customer->assigned_to !== $user->id) {
-                return redirect()->back()->withErrors(['customer_id' => 'غير مصرح لك بإضافة إجراء لهذا العميل.'])->withInput();
-            }
-        }
+        $customer = Customer::findOrFail($validated['customer_id']);
+
 
         Action::create([
             'id'          => Str::uuid()->toString(),
@@ -59,23 +48,6 @@ class ActionController extends Controller
         ]);
 
         return redirect()->route('actions.index')->with('success', 'تم إضافة الإجراء بنجاح');
-    }
-
-    public function indexForCustomer($customerId)
-    {
-        $customer = Customer::findOrFail($customerId);
-
-        $user = Auth::user();
-        if ($user->role === 'admin') {
-            $actions = Action::with('user')->where('customer_id', $customer->id)->get();
-        } else {
-            $actions = Action::with('user')
-                ->where('customer_id', $customer->id)
-                ->where('user_id', $user->id)
-                ->get();
-        }
-
-        return view('dashboard.actions.index', compact('actions', 'customer'));
     }
 
 }
